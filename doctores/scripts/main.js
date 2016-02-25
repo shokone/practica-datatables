@@ -1,6 +1,7 @@
 'use strict';
 var idDoctor;
 $(document).ready(function() {
+    //formularo nuevo doctor
     var tabla = $('#tabla').DataTable({
         //'ajax': 'http://ivan.infenlaces.com/doctores/php/cargar_vista.php',
         //'ajax': 'php/cargar_vista.php',
@@ -68,11 +69,17 @@ $(document).ready(function() {
                 },
             })
             .done(function() {
-                var $tabla = $('#tabla').DataTable({
-                    bRetrieve: true,
-                });
-                $tabla.draw();
-                $.growl.notice({ message: "El doctor ha sido borrado correctamente." });
+                //si todo ha salido bien confirmamos si queremos borrar el doctor
+                var con = confirm("¿Borrar doctor?");
+                if(con){
+                    var $tabla = $('#tabla').DataTable({
+                        bRetrieve: true,
+                    });
+                    $tabla.draw();
+                    $.growl.notice({ message: "El doctor ha sido borrado correctamente." });
+                }else{
+                    $.growl.error({ message: "Error al borrar el doctor" });
+                }
             })
             .fail(function() {
                 $.growl.error({ message: "Error al borrar el doctor" });
@@ -215,5 +222,38 @@ $(document).ready(function() {
             complete: {}
         });
         $.modal.close();
+    });
+
+    //validamos los datos de los formularios
+    //formulario editar
+    $("#formEditar").validate({
+        rules: {
+            nombre: {
+                required: true,
+                lettersonly: true,
+            },
+            numcolegiado: {
+                required: true,
+                digits: true,
+            },
+            clinicas: {
+                required: true,
+            }
+        }
+    });
+    $("#formCrear").validate({
+        rules: {
+            nombreNuevo: {
+                required: true,
+                lettersonly: true,
+            },
+            numcolegiadoNuevo: {
+                required: true,
+                digits: true,
+            },
+            clinicas_n: {
+                required: true,
+            }
+        }
     });
 });
