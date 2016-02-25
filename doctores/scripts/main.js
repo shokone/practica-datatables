@@ -86,6 +86,28 @@ $(document).ready(function() {
             });
     });
 
+    //comprobamos el formulario de edición de un doctor
+    $("#formEditar").validate({
+        focusInvalid: false,
+        onkeyup: true,
+        onfocusout: false,
+        rules: {
+            nombre: {required: true, lettersonly: true},
+            numcolegiado: {required: true, digits: true},
+            clinicas: {required: true}
+        },
+        messages:{
+            nombre: {
+                required: "Debe introducir un nombre válido.",
+                lettersonly: "Sólo puede introducir letras."
+            }, numcolegiado: {
+                required: "Debe introducir un número de colegiado válido.",
+                digits: "Sólo puede introducir caracteres numéricos."
+            }, clinicas: "Debe seleccionar al menos una clínica.",
+            message: "Este campo es obligatorio."
+        }
+    });
+
     //boton enviar del form editar
     $('#enviar').on("click", function(e) {
         e.preventDefault();
@@ -191,6 +213,32 @@ $(document).ready(function() {
     }
     cargarClinicaCrear();
 
+    //comprobamos el formulario de creación de un nuevo doctor
+    $("#formCrear").validate({
+        focusInvalid: true,
+        onkeyup: true,
+        onfocusout: false,
+        onbusmit: false,
+        rules: {
+            nombreNuevo: {required: true, lettersonly: true},
+            numcolegiadoNuevo: {required: true, digits: true},
+            clinicas_n: {required: true}
+        },
+        messages:{
+            nombreNuevo: {
+                required: "Debe introducir un nombre válido.",
+                lettersonly: "Sólo puede introducir letras."
+            }, numcolegiadoNuevo: {
+                required: "Debe introducir un número de colegiado válido.",
+                digits: "Sólo puede introducir caracteres numéricos."
+            }, clinicas_n: "Debe seleccionar al menos una clínica.",
+            message: "Este campo es obligatorio."
+        },
+        submitHandler: function(form){
+            form.submit();
+        }
+    });
+
     // función para crear un nuevo doctor
     $('#enviarDoc').on("click", function(e) {
         e.preventDefault();
@@ -223,37 +271,5 @@ $(document).ready(function() {
         });
         $.modal.close();
     });
-
-    //validamos los datos de los formularios
-    //formulario editar
-    $("#formEditar").validate({
-        rules: {
-            nombre: {
-                required: true,
-                lettersonly: true,
-            },
-            numcolegiado: {
-                required: true,
-                digits: true,
-            },
-            clinicas: {
-                required: true,
-            }
-        }
-    });
-    $("#formCrear").validate({
-        rules: {
-            nombreNuevo: {
-                required: true,
-                lettersonly: true,
-            },
-            numcolegiadoNuevo: {
-                required: true,
-                digits: true,
-            },
-            clinicas_n: {
-                required: true,
-            }
-        }
-    });
+    
 });
