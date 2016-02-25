@@ -32,6 +32,8 @@ if (isset($_REQUEST['id_doctor'])) {
  * Get data to display
  */
 $query = "delete from doctores where id_doctor=" . $id_doctor;
+$query2 = "delete from clinica_doctor where id_doctor=".$id_doctor;
+$query_res2 = mysql_query($query2);
 $query_res = mysql_query($query);
 // Comprobar el resultado
 if (!$query_res) {

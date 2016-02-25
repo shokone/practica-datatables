@@ -1,20 +1,27 @@
-td .btn-primary {margin-right: 3px;}
-body {margin-top:50px;}
-#formulario{display:none;}
-#edicionok{display: none}
-#edicionerr{display: none}
-#imgDiente{height: 20px;width: 20px;}
-#formularioCrear{display: none}
-#github{margin-left: 20px;}
-
-
-#form_nuevo_doctor{
-	display: none;
+td .btn-primary {
+	margin-right: 3px;
 }
-#form_edita_doctor{
-	display: none;
+body {
+	margin-top:50px;
 }
-
+#formulario, 
+#formularioCrear, 
+#form_nuevo_doctor, 
+#form_edita_doctor, 
+#edicionerr, 
+#edicionok, 
+#ventana_formulario, 
+#ventana_formulario_crear{
+	display:none;
+}
+#formulario, #formularioCrear{
+	margin: auto;
+	height: 400px;
+	width: 600px;
+}
+#github{
+	margin-left: 20px;
+}
 li{
 	list-style-type: none;
 }

@@ -2,6 +2,7 @@
 var idDoctor;
 $(document).ready(function() {
     var tabla = $('#tabla').DataTable({
+        //'ajax': 'http://ivan.infenlaces.com/doctores/php/cargar_vista.php',
         //'ajax': 'php/cargar_vista.php',
         'ajax': 'http://localhost/doctores/php/cargar_vista.php',
         'paging': true,
@@ -9,28 +10,7 @@ $(document).ready(function() {
         'processing': true,
         'serverSide': true,
         'language': {
-            'sProcessing': 'Procesando...',
-            'sLengthMenu': 'Mostrar _MENU_ registros',
-            'sZeroRecords': 'No se encontraron resultados',
-            'sEmptyTable': 'Ningún dato disponible en esta tabla',
-            'sInfo': 'Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros',
-            'sInfoEmpty': 'Mostrando registros del 0 al 0 de un total de 0 registros',
-            'sInfoFiltered': '(filtrado de un total de _MAX_ registros)',
-            'sInfoPostFix': '',
-            'sSearch': 'Buscar:',
-            'sUrl': '',
-            'sInfoThousands': ',',
-            'sLoadingRecords': 'Cargando...',
-            'oPaginate': {
-                'sFirst': 'Primero',
-                'sLast': 'Último',
-                'sNext': 'Siguiente',
-                'sPrevious': 'Anterior'
-            },
-            'oAria': {
-                'sSortAscending': ': Activar para ordenar la columna de manera ascendente',
-                'sSortDescending': ': Activar para ordenar la columna de manera descendente'
-            }
+            "language": {"url": "https://cdn.datatables.net/plug-ins/1.10.10/i18n/Spanish.json"}
         },
         'columns': [{
                 'data': 'nombre'
@@ -46,23 +26,21 @@ $(document).ready(function() {
             }, {
                 'data': 'idDoctor',
                 'render': function(data) {
-                    return '<a class="btn btn-primary editarbtn" href=http://localhost/doctores/php/edit_doctor.php?id_doctor=' + data + '>Editar</a>';
+                    return '<a class="btn btn-primary editarbtn">Editar</a>';
                 }
             }, {
                 'data': 'idDoctor',
                 'render': function(data) {
-                    return '<a class="btn btn-warning borrarbtn" href=http://localhost/doctores/php/borrar_doctor.php?id_doctor=' + data + '>Borrar</a>';
+                    return '<a class="btn btn-warning borrarbtn">Borrar</a>';
                 }
-            }
-        ]
+        }]
     });
-    //editar
+
+    //editar doctor
     $('#tabla').on('click', '.editarbtn', function(e) {
         e.preventDefault();
 
-        $('#tabla').fadeOut(100); //oculta tabla (los row del html)
-        $('#formulario').fadeIn(100); //muestra formulario (los row del html)
-
+        $("#formulario").modal();
         var nRow = $(this).parents('tr')[0];
         var aData = tabla.row(nRow).data();
         $('#idDoctor').val(aData.idDoctor);
@@ -71,45 +49,38 @@ $(document).ready(function() {
         $('#clinicas').val(aData.clinicas);
     });
 
-    //borrar
+    //borrar doctor
     $('#tabla').on('click', '.borrarbtn', function(e) {
         e.preventDefault();
         var nRow = $(this).parents('tr')[0];
         var aData = tabla.row(nRow).data();
+        console.log("primero "+idDoctor);
         idDoctor = aData.idDoctor;
+        console.log("hola "+idDoctor);
         $.ajax({
                 type: 'POST',
                 dataType: 'json',
+                //url: 'http://ivan.infenlaces.com/doctores/php/borrar_doctor.php',
                 //url: 'php/borrar_doctor.php',
                 url: 'http://localhost/doctores/php/borrar_doctor.php',
                 data: {
-                    id_doctor: idDoctor
+                    id_doctor: idDoctor,
                 },
-                error: function(xhr, status, error) {
-                    alert("error al borrar el doctor");
-                },
-                success: function(data) {
-                    var $tabla = $("#tabla").dataTable({
-                        bRetrieve: true
-                    });
-                    $tabla.fnDraw();
-                },
-                complete: {}
             })
             .done(function() {
-                var $tabla = $('#tabla').dataTable({
-                    bRetrieve: true
+                var $tabla = $('#tabla').DataTable({
+                    bRetrieve: true,
                 });
-                $tabla.fnDraw();
-                console.log('Se ha borrado el doctor');
+                $tabla.draw();
+                $.growl.notice({ message: "El doctor ha sido borrado correctamente." });
             })
             .fail(function() {
-                console.log('error al borrar el doctor');
+                $.growl.error({ message: "Error al borrar el doctor" });
             });
     });
 
     //boton enviar del form editar
-    $('#enviar').click(function(e) {
+    $('#enviar').on("click", function(e) {
         e.preventDefault();
         var idDoctor = $('#idDoctor').val();
         var nombre = $('#nombre').val();
@@ -118,39 +89,46 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
+            //url: 'http://ivan.infenlaces.com/doctores/php/edit_doctor.php',
             //url: 'php/edit_doctores.php',
             url: 'http://localhost/doctores/php/edit_doctor.php',
-
             data: {
                 id_doctor: idDoctor,
                 nombre: nombre,
                 numcolegiado: numcolegiado,
                 clinicas: clinicas
             },
-            error: function(xhr, status, error) {
-                alert("Error al enviar el formulario editar");
-            },
             success: function(data) {
-                var $tabla = $('#tabla').dataTable({
-                    bRetrieve: true
+                $.growl.notice({ message: "La modificación ha sido un éxito." });
+                var $tabla = $('#tabla').DataTable({
+                    bRetrieve: true,
                 });
-                $tabla.fnDraw();
+                $tabla.draw();
+            },
+            error: function(xhr, status, error) {
+                $.growl.error({ message: "El doctor no ha podido ser editado." });
             },
             complete: {}
         });
-        $('#tabla').fadeIn(100);
-        $('#formulario').fadeOut(100);
-        $('#formularioCrear').fadeOut(100);
-        location.reload();
+        $.modal.close();
+    });
+
+    //comprobamos los botones cancelar
+    $("#cancelar").on("click", function(e){
+        e.preventDefault();
+        $.growl.warning({ message: "Cancelada la edición por el usuario." });
+        $.modal.close();
+    });
+    $("#cancelar2").on("click", function(e){
+        e.preventDefault();
+        $.growl.warning({ message: "Cancelada la creación del doctor por el usuario." });
+        $.modal.close();
     });
 
     //añadir doctor
     $('#newdoctor').click(function(e) {
         e.preventDefault();
-
-        //oculto tabla muestro form
-        $('#tabla').fadeOut(100);
-        $('#formularioCrear').fadeIn(100);
+        $("#formularioCrear").modal();
         cargarClinicaCrear();
     });
 
@@ -158,6 +136,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
+            //url: 'http://ivan.infenlaces.com/doctores/php/listar_clinicas.php',
             //url: 'php/listar_clinicas.php',
             url: 'http://localhost/doctores/php/listar_clinicas.php',
             error: function(xhr, status, error) {
@@ -178,16 +157,14 @@ $(document).ready(function() {
     cargarClinicas();
     $('#creaDoc').click(function(e) {
         e.preventDefault();
-
-        //oculto tabla muestro form
-        $('#tabla').fadeOut(100);
-        $('#formularioCrear').fadeIn(100);
     });
+
     //  Este es el script para cargar las clinicas en el formulario
     function cargarClinicaCrear() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
+            //url: 'http://ivan.infenlaces.com/doctores/php/listar_clinicas.php',
             //url: 'php/listar_clinicas.php',
             url: 'http://localhost/doctores/php/listar_clinicas.php',
             error: function(xhr, status, error) {
@@ -206,8 +183,9 @@ $(document).ready(function() {
         });
     }
     cargarClinicaCrear();
-    // Este script envia los datos al php para crear el doctor
-    $('#enviarDoc').click(function(e) {
+
+    // función para crear un nuevo doctor
+    $('#enviarDoc').on("click", function(e) {
         e.preventDefault();
         var nombreNuevo = $('#nombreNuevo').val();
         var numcolegiadoNuevo = $('#numcolegiadoNuevo').val();
@@ -215,6 +193,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
+            //url: 'http://ivan.infenlaces.com/doctores/php/crear_doctor.php',
             //url: 'php/crear_doctor.php',
             url: 'http://localhost/doctores/php/crear_doctor.php',
             data: {
@@ -222,18 +201,19 @@ $(document).ready(function() {
                 numcolegiadoNuevo: numcolegiadoNuevo,
                 clinicas_n: clinicas_n
             },
-            error: function(xhr, status, error) {
-                //mostraríamos alguna ventana de alerta con el error
-            },
             success: function(data) {
-                var $tabla = $('#tabla').dataTable({
+                var $tabla = $('#tabla').DataTable({
                     bRetrieve: true
                 });
-                $tabla.fnDraw();
+                $tabla.draw();
+                $.growl.notice({ message: "El doctor se ha creado correctamente." });
+            },
+            error: function(xhr, status, error) {
+                //mostraríamos alguna ventana de alerta con el error
+                $.growl.error({ message: "Error. El doctor no ha podido crearse." });
             },
             complete: {}
         });
-        $('#tabla').fadeIn(100);
-        $('#formularioCrear').fadeOut(100);
+        $.modal.close();
     });
 });
