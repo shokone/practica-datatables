@@ -3,7 +3,7 @@ var idDoctor;
 $(document).ready(function() {
     //formularo nuevo doctor
     var tabla = $('#tabla').DataTable({
-        //'ajax': 'http://ivan.infenlaces.com/doctores/php/cargar_vista.php',
+        //'ajax': 'http://ivan.infenlaces.com/datatables/php/cargar_vista.php',
         //'ajax': 'php/cargar_vista.php',
         'ajax': 'http://localhost/doctores/php/cargar_vista.php',
         'paging': true,
@@ -55,13 +55,11 @@ $(document).ready(function() {
         e.preventDefault();
         var nRow = $(this).parents('tr')[0];
         var aData = tabla.row(nRow).data();
-        console.log("primero "+idDoctor);
         idDoctor = aData.idDoctor;
-        console.log("hola "+idDoctor);
         $.ajax({
                 type: 'POST',
                 dataType: 'json',
-                //url: 'http://ivan.infenlaces.com/doctores/php/borrar_doctor.php',
+                //url: 'http://ivan.infenlaces.com/datatables/php/borrar_doctor.php',
                 //url: 'php/borrar_doctor.php',
                 url: 'http://localhost/doctores/php/borrar_doctor.php',
                 data: {
@@ -86,14 +84,21 @@ $(document).ready(function() {
             });
     });
 
+    //comprobamos el formulario, si todo es válido habilitamos el botón enviar
+    $('#enviar').attr('disabled', 'disabled');
+        $('#formEditar').bind('change keyup', function() {
+        if($(this).validate().checkForm()) {
+            $('#enviar').removeAttr('disabled');
+        } else {
+            $('#enviar').attr('disabled', 'disabled');
+        } 
+    });
     //comprobamos el formulario de edición de un doctor
     $("#formEditar").validate({
-        focusInvalid: false,
-        onkeyup: true,
-        onfocusout: false,
+        onsubmit: false,
         rules: {
             nombre: {required: true, lettersonly: true},
-            numcolegiado: {required: true, digits: true},
+            numcolegiado: {required: false, digits: true},
             clinicas: {required: true}
         },
         messages:{
@@ -118,7 +123,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            //url: 'http://ivan.infenlaces.com/doctores/php/edit_doctor.php',
+            //url: 'http://ivan.infenlaces.com/datatables/php/edit_doctor.php',
             //url: 'php/edit_doctores.php',
             url: 'http://localhost/doctores/php/edit_doctor.php',
             data: {
@@ -165,7 +170,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            //url: 'http://ivan.infenlaces.com/doctores/php/listar_clinicas.php',
+            //url: 'http://ivan.infenlaces.com/datatables/php/listar_clinicas.php',
             //url: 'php/listar_clinicas.php',
             url: 'http://localhost/doctores/php/listar_clinicas.php',
             error: function(xhr, status, error) {
@@ -193,7 +198,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            //url: 'http://ivan.infenlaces.com/doctores/php/listar_clinicas.php',
+            //url: 'http://ivan.infenlaces.com/datatables/php/listar_clinicas.php',
             //url: 'php/listar_clinicas.php',
             url: 'http://localhost/doctores/php/listar_clinicas.php',
             error: function(xhr, status, error) {
@@ -213,15 +218,21 @@ $(document).ready(function() {
     }
     cargarClinicaCrear();
 
+    //comprobamos el formulario, si todo es válido habilitamos el botón enviar
+    $('#enviarDoc').attr('disabled', 'disabled');
+        $('#formCrear').bind('change keyup', function() {
+        if($(this).validate().checkForm()) {
+            $('#enviarDoc').removeAttr('disabled');
+        } else {
+            $('#enviarDoc').attr('disabled', 'disabled');
+        } 
+    });
     //comprobamos el formulario de creación de un nuevo doctor
     $("#formCrear").validate({
-        focusInvalid: true,
-        onkeyup: true,
-        onfocusout: false,
-        onbusmit: false,
+        onsubmit: false,
         rules: {
             nombreNuevo: {required: true, lettersonly: true},
-            numcolegiadoNuevo: {required: true, digits: true},
+            numcolegiadoNuevo: {required: false, digits: true},
             clinicas_n: {required: true}
         },
         messages:{
@@ -234,9 +245,6 @@ $(document).ready(function() {
             }, clinicas_n: "Debe seleccionar al menos una clínica.",
             message: "Este campo es obligatorio."
         },
-        submitHandler: function(form){
-            form.submit();
-        }
     });
 
     // función para crear un nuevo doctor
@@ -248,7 +256,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            //url: 'http://ivan.infenlaces.com/doctores/php/crear_doctor.php',
+            //url: 'http://ivan.infenlaces.com/datatables/php/crear_doctor.php',
             //url: 'php/crear_doctor.php',
             url: 'http://localhost/doctores/php/crear_doctor.php',
             data: {

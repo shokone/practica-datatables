@@ -19,22 +19,18 @@ if (!mysql_select_db($ivanSql['db'], $ivanSql['link'])) {
     fatal_error('Could not select database ');
 }
 mysql_query('SET names utf8');
-//$_REQUEST['id_doctor'] = 1;
 if (isset($_REQUEST['id_doctor'])) {
-    // param was set in the query string
     if (empty($_REQUEST['id_doctor'])) {
-        return "El parámetro id_doctor viene vacio!";
+        return "El parámetro id_doctor no puede estar vacio!";
     }
     $id_doctor = $_REQUEST['id_doctor'];
 }
-/*
- * SQL queries
- * Get data to display
- */
+
+//ejecutamos las consultas a la base de datos necesarias
 $query = "delete from doctores where id_doctor=" . $id_doctor;
 $query2 = "delete from clinica_doctor where id_doctor=".$id_doctor;
-$query_res2 = mysql_query($query2);
-$query_res = mysql_query($query);
+$query_res2 = mysql_query($query2);//primero borramos las asociaciones entre doctor y clinica
+$query_res = mysql_query($query);//despues borramos los doctores
 // Comprobar el resultado
 if (!$query_res) {
     if (mysql_errno() == 1451) {
@@ -48,10 +44,9 @@ if (!$query_res) {
     $mensaje = "Borrado correcto";
     $estado = 0;
 }
-$resultado = array();
-$resultado[] = array(
+$resultado[] = [
     'mensaje' => $mensaje,
     'estado' => $estado
-);
+];
 echo json_encode($resultado);
 ?>

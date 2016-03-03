@@ -19,6 +19,9 @@ body {
 	height: 400px;
 	width: 600px;
 }
+#formulario{
+	height:500px;
+}
 #github{
 	margin-left: 20px;
 }
